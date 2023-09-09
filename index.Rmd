@@ -1,0 +1,72 @@
+---
+title: "OrTia"
+output: 
+  html_document:
+    code_folding: show
+    theme:
+      bg: "#202123"
+      fg: "#B8BCC2"
+      primary: "#EA80FC"
+      secondary: "#00DAC6"
+      base_font:
+        google: Prompt
+      heading_font:
+        google: Proza Libre
+---
+
+```{r setup, include=FALSE}
+if (requireNamespace("thematic")) 
+  thematic::thematic_rmd(font = "auto")
+```
+
+
+OrTia is a page which contains insight into modern day economy through interactive graphs. The graphs are:
+
+MAP
+Hoover with your mouse over a certain country in order to get insight into its GDP, unemployment, interest rates etc.
+
+```{r include=FALSE}
+
+library(readxl)
+library(plotly)
+econ_data_countries_Map <- read_excel("C:/Users/Ante/Desktop/R vjezbe/Euro Area Economic Data.xlsx", 
+                                     col_types = c("text", "text", "numeric", "numeric", "numeric", "numeric", "numeric"))
+
+econ_data_countries_Map
+
+print <- econ_data_countries_Map %>% print(n = 50)
+
+econ_data_countries_Map$hover <- with(econ_data_countries_Map, paste("Unemployment", Unemployment, "HICP", HICP, '<br>'
+                                                                     , "Government Debt Ratio", Government_debt_ratio, "Loan for consumption", Loan_for_consumption_1Y
+ ))
+
+l <- list(color = toRGB("white"), width = 2)
+
+g <- list(
+  scope = 'Europe',
+  projection = list(type = 'Europe'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+fig1 <- plot_geo(econ_data_countries_Map, locationmode = 'Europe')
+
+fig1 <- fig1 %>% add_trace(
+  z = ~GDP, text = ~hover, locations = ~CODE,
+  color = ~GDP, colors = 'Purples'
+)
+
+fig1 <- fig1 %>% colorbar(title = "GDP in Millions")
+fig1 <- fig1 %>% layout(
+  title = 'GDP in Millions EUR and Unemployment Rate<br>(Hover for breakdown)',
+  geo = g
+)
+
+fig1
+
+
+```
+
+```{r fig1, echo=FALSE}
+fig1
+```
